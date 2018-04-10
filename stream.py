@@ -1,7 +1,7 @@
 import json 
 import tweepy
 import socket
-
+import re
 
 ACCESS_TOKEN = '2257758242-bGEWDiMgjqJ0diinLosmjzlFgBeTF2bj40VoumB'
 ACCESS_SECRET = 'e1wHHXF0IzU6UHeCawCLE4l7eCYTBJClRACTPc5gILbgg'
@@ -23,13 +23,14 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # s.connect((TCP_IP, TCP_PORT))
 s.bind((TCP_IP, TCP_PORT))
 s.listen(1)
-print("1")
 conn, addr = s.accept()
-print("2")
 class MyStreamListener(tweepy.StreamListener):
     def on_status(self, status):
-        print(status.text)
-        # conn.send(status.text.encode('utf-8'))
+        print(self.clean_tweet(status.text))
+	conn.send(self.clean_tweet(status.text).encode('utf-8'))
+
+    def clean_tweet(self, tweet):
+        return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
     
     def on_error(self, status_code):
         if status_code == 420:

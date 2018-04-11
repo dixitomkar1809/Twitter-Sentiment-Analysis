@@ -9,26 +9,25 @@
 # MSE of the model.
 
 
+
 from pyspark.mllib.recommendation import ALS, MatrixFactorizationModel, Rating
 from pyspark.context import SparkContext
 from pyspark import SparkConf
-sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 import numpy
-data = sc.textFile("D:/PycharmProjects/BigDataAssignment3/ratings.dat")
-ratings = data.map(lambda l: l.split("::")).map(lambda l: Rating(int(l[0]), int(l[1]), int(l[2]), int(l[3])))
+sc = SparkContext.getOrCreate(SparkConf().setMaster("local[*]"))
 
-#building the recommendation model using ALS
-rank= 10
+data = sc.textFile("ratings.dat")
+ratings = data.map(lambda l: l.split('::'))\
+    .map(lambda l: Rating(int(l[0]), int(l[1]), float(l[2])))
+
+training, testing = ratings.randomSplit(weights = [0.6, 0.4], seed=1)
+
+rank = 10
 numIterations = 10
-model = ALS.train(ratings, rank, numIterations)
+model = ALS.train(training, rank, numIterations)
 
-#Evaluate the model on training data
-testdata = ratings.map(lambda p: (p[0], p[1]))
+testdata = testing.map(lambda p: (p[0], p[1]))
 predictions = model.predictAll(testdata).map(lambda r: ((r[0], r[1]), r[2]))
-ratesAndPreds = ratings.map(lambda r: ((r[0], r[1]), r[2])).join(predictions)
+ratesAndPreds = testing.map(lambda r: ((r[0], r[1]), r[2])).join(predictions)
 MSE = ratesAndPreds.map(lambda r: (r[1][0] - r[1][1])**2).mean()
 print("Mean Squared Error = " + str(MSE))
-
-# Save and load model
-model.save(sc, "target/tmp/myCollaborativeFilter")
-sameModel = MatrixFactorizationModel.load(sc, "target/tmp/myCollaborativeFilter")

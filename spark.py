@@ -13,7 +13,7 @@ conf.setMaster('local[2]')
 sc = SparkContext(conf=conf)
 
 # create the Streaming Context from spark context with interval size 2 seconds
-ssc = StreamingContext(sc, 2)
+ssc = StreamingContext(sc, 4)
 ssc.checkpoint("checkpoint_TwitterApp")
 # read data from port 900
 dataStream = ssc.socketTextStream(TCP_IP, TCP_PORT)

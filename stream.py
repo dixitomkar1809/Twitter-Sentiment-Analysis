@@ -12,7 +12,8 @@ CONSUMER_SECRET = 'nTCIMxTUe0oLKt9MYiK78Xgj6Ip8ocXNgrLBytc9cMJ7tYMyJP'
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 
-hashtag = '#trump'
+# hashtag = '#trump'
+hashtag = '#guncontrolnow'
 
 TCP_IP = 'localhost'
 TCP_PORT = 9001

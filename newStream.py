@@ -30,8 +30,8 @@ class MyStreamListener(tweepy.StreamListener):
         if status.user.location is not None:
             cleanTweet = self.clean_tweet(status.text)
             # print self.clean_tweet(status.text)
-            print cleanTweet
-            print status.user.location
+            # print cleanTweet
+            # print status.user.location
             URl = "https://maps.googleapis.com/maps/api/geocode/json"+"?address='"+status.user.location+"'&key=%20AIzaSyC60BTMhJOp5Q_xrt6MOmIKo6wI-8irhYo"
             # print URl
             results = requests.get(url= URl)
@@ -40,13 +40,21 @@ class MyStreamListener(tweepy.StreamListener):
                 return
             if len(data['results'][0]['address_components']) > 0:
                 for x in data['results'][0]['address_components']:
-                    if x['long_name'] == 'United States':
-                        latitude = data['results'][0]['geometry']['location']['lat']
-                        longitude = data['results'][0]['geometry']['location']['lng']
-                        print latitude, longitude
-                        location = "::::"+str(latitude)+";;;;"+str(longitude)
-                        finalText = cleanTweet + location + "||#||" + "\n"
-                        conn.send(finalText.encode('utf-8'))
+                    latitude = data['results'][0]['geometry']['location']['lat']
+                    longitude = data['results'][0]['geometry']['location']['lng']
+                    dict = {'text': cleanTweet, 'location': status.user.location, 'coordinates': [latitude, longitude]}
+                    finalOutput = json.dumps(dict)
+                    print(finalOutput)
+                    finalOutput = finalOutput + "\n"
+                    conn.send(finalOutput.encode('utf-8'))
+                    # if x['long_name'] == 'United States':
+                    #     latitude = data['results'][0]['geometry']['location']['lat']
+                    #     longitude = data['results'][0]['geometry']['location']['lng']
+                    #     dict = {'text': cleanTweet, 'location': status.user.location, 'coordinates': [latitude, longitude]}
+                    #     finalOutput = json.dumps(dict)
+                    #     print(finalOutput)
+                    #     finalOutput = finalOutput + "\n"
+                    #     conn.send(finalOutput.encode('utf-8'))
 
     def clean_tweet(self, tweet):
         return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())

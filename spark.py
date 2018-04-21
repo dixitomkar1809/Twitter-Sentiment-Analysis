@@ -9,6 +9,7 @@ import json
 
 def get_tweet_sentiment(tweet):
         # create TextBlob object of passed tweet text
+        # analysis = TextBlob(tweet["tweet"])
         analysis = TextBlob(tweet["text"])
         # set sentiment
         if analysis.sentiment.polarity > 0:
@@ -30,7 +31,8 @@ def ES_connector(partition):
 		if(len(tweets) != 0):
 			for tweet in tweets:
 				doc = {
-					"text": tweet['text'],
+					# "text": tweet['tweet'],
+                    "text": tweet['text'],
 					"location": {
 							"lat": tweet['coordinates'][0],
 							"lon": tweet['coordinates'][1]
